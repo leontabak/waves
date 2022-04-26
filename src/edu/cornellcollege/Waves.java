@@ -1,6 +1,7 @@
 package edu.cornellcollege;
 
 import javax.swing.JFrame;
+import java.awt.*;
 
 public class Waves extends JFrame {
     private static final int FRAME_WIDTH = 768;
@@ -11,6 +12,10 @@ public class Waves extends JFrame {
         this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Container pane = this.getContentPane();
+        WavesPanel panel = new WavesPanel();
+        pane.add(panel);
 
         this.setVisible(true);
     } // Waves()

@@ -4,17 +4,21 @@ import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class WavesPanel extends JPanel {
 
     // TO-DO: Experiment with different colors.
     // TO-DO: Create a List of more than 2 colors.
     private static final Color FG_COLOR =
-            new Color( 236, 228, 232 );
+            new Color(236, 228, 232);
     private static final Color BG_COLOR =
-            new Color( 72, 64, 140 );
+            new Color(72, 64, 140);
 
     public WavesPanel() {
         this.setBackground(Color.DARK_GRAY);
@@ -76,7 +80,7 @@ public class WavesPanel extends JPanel {
         int green = c.getGreen();
         int blue = c.getBlue();
 
-        int [] result = { red, green, blue };
+        int[] result = {red, green, blue};
         return result;
     } // makeColorArray( Color )
 
@@ -114,6 +118,18 @@ public class WavesPanel extends JPanel {
 
         double uWidth = uMax - uMin;
         double vHeight = vMax - vMin;
+
+        Random rng = new Random();
+        int n = 1 + rng.nextInt(15);
+        List<Ripple> ripples = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            double u = uMin + rng.nextDouble() * uWidth;
+            double v = vMin + rng.nextDouble() + vHeight;
+
+            Point2D center = new Point2D.Double(u, v);
+            Ripple r = new Ripple(center, 32);
+            ripples.add(r);
+        } // for
 
         for (int y = yMin; y < yMax; y++) {
             for (int x = xMin; x < xMax; x++) {
@@ -166,9 +182,13 @@ public class WavesPanel extends JPanel {
                 // the world, but somewhere else?
 
                 // Distance of a point from the center
-                // of our world.
-                double distance =
-                        Math.sqrt( u * u + v * v );
+                // of a ripple.
+                double distances = 0.0;
+                Point2D p = new Point2D.Double(u, v);
+                for (Ripple r : ripples) {
+                    distances += r.getHeight(p);
+                } // for
+                distances /= ripples.size();
 
                 // A wave has 3 properties:
                 //   * amplitude is the height of wave
@@ -178,21 +198,33 @@ public class WavesPanel extends JPanel {
                 // TO-DO: Experiment with different
                 // values of amplitude, frequency, and
                 // phase.
-                double amplitude = 1.0;
-                double frequency = 48.0;
-                double phase = 0.0;
-
-                double t = amplitude * Math.sin(
-                        frequency * distance + phase);
-                t = (t + 1)/2.0;
+//                double amplitude = 1.0;
+//                double frequency = 48.0;
+//                double phase = 0.0;
+//
+//                double t = amplitude * Math.sin(
+//                        frequency * distance + phase);
+                double t = (distances + 1) / 2.0;
 
                 Color c = weightedAverage(
-                        FG_COLOR, BG_COLOR, t );
+                        FG_COLOR, BG_COLOR, t);
 
                 // TO-DO: Can you draw overlapping
                 // ripples from several stones?
 
-                raster.setPixel( x, y, makeColorArray(c));
+                // TO-DO: Try this way of assigning colors.
+                //raster.setPixel(x, y, makeColorArray(c));
+
+                // TO-DO: Or try this way of assigning colors.
+                // TO-DO: Try different values of k.
+                // TO-DO: Try using more than 2 colors.
+                int k = 8;
+                if (Math.round(t * k) % 2 == 0) {
+                    raster.setPixel(x, y, makeColorArray(FG_COLOR));
+                } // if
+                else {
+                    raster.setPixel(x, y, makeColorArray(BG_COLOR));
+                } // else
 
             } // for
         } // for

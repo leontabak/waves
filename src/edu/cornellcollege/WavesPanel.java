@@ -17,29 +17,30 @@ public class WavesPanel extends JPanel {
     private final Random rng;
     private final List<Color> palette;
     private final List<Point2D> sites;
-    private final double frequency;
+    private int numberOfColors;
+    private int numberOfSites;
+    private double frequency;
 
     public WavesPanel() {
         this.rng = new Random();
-        this.frequency = 16;
+        this.numberOfColors = 24;
+        this.numberOfSites = 5;
+        this.frequency = 40;
 
-        int numberOfColors = 20;
         int min = 64;
-        this.palette = randomPalette(numberOfColors, min);
+        this.palette = randomPalette(min);
 
-        int number = 12;
-        this.sites = sites(number);
+        //int number = 4;
+        this.sites = gridSites();
 
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
 
-    private final List<Color> randomPalette(
-            int numberOfColors,
-            int min) {
+    private final List<Color> randomPalette(int min) {
 
         List<Color> result = new ArrayList<>();
 
-        for (int i = 0; i < numberOfColors; i++) {
+        for (int i = 0; i < this.numberOfColors; i++) {
             int red = min
                     + this.rng.nextInt(256 - min);
             int green = min
@@ -113,12 +114,12 @@ public class WavesPanel extends JPanel {
         return result;
     } // makeColorArray( Color )
 
-    public final List<Point2D> sites(int number) {
+    public final List<Point2D> randomSites() {
         List<Point2D> result = new ArrayList<>();
 
-        for (int i = 0; i < number; i++) {
-            double u = rng.nextDouble();
-            double v = rng.nextDouble();
+        for (int i = 0; i < this.numberOfSites; i++) {
+            double u = 2 * rng.nextDouble() - 1;
+            double v = 2 * rng.nextDouble() - 1;
 
             Point2D p = new Point2D.Double(u, v);
 
@@ -126,16 +127,42 @@ public class WavesPanel extends JPanel {
         } // for
 
         return result;
-    } // sites( int )
+    } // randomSites()
+
+    public final List<Point2D> gridSites() {
+        List<Point2D> result = new ArrayList<>();
+
+        double xMin = -0.8;
+        double xMax = +0.8;
+        double yMin = -0.8;
+        double yMax = +0.8;
+
+        int n = this.numberOfSites;
+
+        for( int i = 0; i < n; i++ ) {
+            double vertical = ((double) i)/n;
+            double y = yMin + vertical * (yMax - yMin);
+
+            for( int j = 0; j< n; j++ ) {
+                double horizontal = ((double) j)/n;
+                double x = xMin + horizontal * (xMax - xMin);
+
+                Point2D p = new Point2D.Double( x, y );
+                result.add( p );
+            } // for
+        } // for
+
+        return result;
+    } // gridSites()
 
     public final List<Ripple> ripples(
             Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();
         for (Point2D p : this.sites) {
             double u = bounds.getMinX()
-                    + p.getX() * bounds.getWidth();
+                    + (p.getX() + 1)/2 * bounds.getWidth();
             double v = bounds.getMinY()
-                    + p.getY() * bounds.getHeight();
+                    + (p.getY() + 1)/2 * bounds.getHeight();
 
             Point2D center = new Point2D.Double(u, v);
 

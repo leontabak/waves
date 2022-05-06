@@ -14,25 +14,44 @@ import java.util.Random;
 
 public class WavesPanel extends JPanel {
 
-    private final List<Color> palette;
     private final Random rng;
+    private final List<Color> palette;
+    private final List<Point2D> sites;
+    private final double frequency;
 
     public WavesPanel() {
         this.rng = new Random();
-        this.palette = new ArrayList<>();
+        this.frequency = 16;
+
         int numberOfColors = 20;
         int min = 64;
-        int max = 256 - min;
-        for (int i = 0; i < numberOfColors; i++) {
-            int red = min + rng.nextInt(256 - min);
-            int green = min + rng.nextInt(256 - min);
-            int blue = min + rng.nextInt(256 - min);
-            Color c = new Color(red, green, blue);
-            palette.add(c);
-        } // for
+        this.palette = randomPalette(numberOfColors, min);
+
+        int number = 12;
+        this.sites = sites(number);
 
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
+
+    private final List<Color> randomPalette(
+            int numberOfColors,
+            int min) {
+
+        List<Color> result = new ArrayList<>();
+
+        for (int i = 0; i < numberOfColors; i++) {
+            int red = min
+                    + this.rng.nextInt(256 - min);
+            int green = min
+                    + this.rng.nextInt(256 - min);
+            int blue = min
+                    + this.rng.nextInt(256 - min);
+            Color c = new Color(red, green, blue);
+            result.add(c);
+        } // for
+
+        return result;
+    } // randomPalette()
 
     /**
      * Compute the weighted average of 2 numbers.
@@ -94,16 +113,29 @@ public class WavesPanel extends JPanel {
         return result;
     } // makeColorArray( Color )
 
-    public List<Ripple> makeRipples(Rectangle2D bounds,
-                                    int maxNumber,
-                                    double frequency) {
-        int n = 1 + rng.nextInt(maxNumber);
+    public final List<Point2D> sites(int number) {
+        List<Point2D> result = new ArrayList<>();
+
+        for (int i = 0; i < number; i++) {
+            double u = rng.nextDouble();
+            double v = rng.nextDouble();
+
+            Point2D p = new Point2D.Double(u, v);
+
+            result.add(p);
+        } // for
+
+        return result;
+    } // sites( int )
+
+    public final List<Ripple> ripples(
+            Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
+        for (Point2D p : this.sites) {
             double u = bounds.getMinX()
-                    + rng.nextDouble() * bounds.getWidth();
+                    + p.getX() * bounds.getWidth();
             double v = bounds.getMinY()
-                    + rng.nextDouble() * bounds.getHeight();
+                    + p.getY() * bounds.getHeight();
 
             Point2D center = new Point2D.Double(u, v);
 
@@ -112,7 +144,7 @@ public class WavesPanel extends JPanel {
         } // for
 
         return ripples;
-    } // makeRipples()
+    } // ripples()
 
     public double getSumOfHeights(double u, double v,
                                   List<Ripple> ripples) {
@@ -141,7 +173,7 @@ public class WavesPanel extends JPanel {
         Color discrete = palette.get(index);
 
         double weight = 1.0;
-        Color c = weightedAverage( continuous, discrete, weight );
+        Color c = weightedAverage(continuous, discrete, weight);
 
         return c;
     } // shade( int, int, double, double, List<Ripple> )
@@ -184,12 +216,7 @@ public class WavesPanel extends JPanel {
         Rectangle2D bounds = new Rectangle2D.Double(
                 uMin, vMin, uWidth, vHeight
         );
-        int maxNumber = 12;
-        double frequency = 80;
-        Random rng = new Random();
-        List<Ripple> ripples = makeRipples(bounds,
-                maxNumber,
-                frequency);
+        List<Ripple> ripples = ripples(bounds);
 
         for (int y = yMin; y < yMax; y++) {
             for (int x = xMin; x < xMax; x++) {

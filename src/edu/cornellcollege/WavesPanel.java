@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
@@ -13,14 +14,23 @@ import java.util.Random;
 
 public class WavesPanel extends JPanel {
 
-    // TO-DO: Experiment with different colors.
-    // TO-DO: Create a List of more than 2 colors.
-    private static final Color FG_COLOR =
-            new Color(236, 228, 232);
-    private static final Color BG_COLOR =
-            new Color(72, 64, 140);
+    private final List<Color> palette;
+    private final Random rng;
 
     public WavesPanel() {
+        this.rng = new Random();
+        this.palette = new ArrayList<>();
+        int numberOfColors = 20;
+        int min = 64;
+        int max = 256 - min;
+        for (int i = 0; i < numberOfColors; i++) {
+            int red = min + rng.nextInt(256 - min);
+            int green = min + rng.nextInt(256 - min);
+            int blue = min + rng.nextInt(256 - min);
+            Color c = new Color(red, green, blue);
+            palette.add(c);
+        } // for
+
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
 
@@ -84,6 +94,58 @@ public class WavesPanel extends JPanel {
         return result;
     } // makeColorArray( Color )
 
+    public List<Ripple> makeRipples(Rectangle2D bounds,
+                                    int maxNumber,
+                                    double frequency) {
+        int n = 1 + rng.nextInt(maxNumber);
+        List<Ripple> ripples = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            double u = bounds.getMinX()
+                    + rng.nextDouble() * bounds.getWidth();
+            double v = bounds.getMinY()
+                    + rng.nextDouble() * bounds.getHeight();
+
+            Point2D center = new Point2D.Double(u, v);
+
+            Ripple r = new Ripple(center, frequency);
+            ripples.add(r);
+        } // for
+
+        return ripples;
+    } // makeRipples()
+
+    public double getSumOfHeights(double u, double v,
+                                  List<Ripple> ripples) {
+        double distances = 0.0;
+        Point2D p = new Point2D.Double(u, v);
+        for (Ripple r : ripples) {
+            distances += r.getHeight(p);
+        } // for
+        distances /= ripples.size();
+
+        return distances;
+    } // getSumOfHeights()
+
+    public Color shade(int x, int y,
+                       double u, double v,
+                       List<Ripple> ripples) {
+        double distances =
+                getSumOfHeights(u, v, ripples);
+
+        double t = (distances + 1) / 2.0;
+
+        Color continuous = weightedAverage(
+                palette.get(0), palette.get(1), t);
+
+        int index = (int) (t * palette.size());
+        Color discrete = palette.get(index);
+
+        double weight = 1.0;
+        Color c = weightedAverage( continuous, discrete, weight );
+
+        return c;
+    } // shade( int, int, double, double, List<Ripple> )
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         java.awt.Graphics2D g2D = (Graphics2D) g;
@@ -119,17 +181,15 @@ public class WavesPanel extends JPanel {
         double uWidth = uMax - uMin;
         double vHeight = vMax - vMin;
 
+        Rectangle2D bounds = new Rectangle2D.Double(
+                uMin, vMin, uWidth, vHeight
+        );
+        int maxNumber = 12;
+        double frequency = 80;
         Random rng = new Random();
-        int n = 1 + rng.nextInt(15);
-        List<Ripple> ripples = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            double u = uMin + rng.nextDouble() * uWidth;
-            double v = vMin + rng.nextDouble() + vHeight;
-
-            Point2D center = new Point2D.Double(u, v);
-            Ripple r = new Ripple(center, 32);
-            ripples.add(r);
-        } // for
+        List<Ripple> ripples = makeRipples(bounds,
+                maxNumber,
+                frequency);
 
         for (int y = yMin; y < yMax; y++) {
             for (int x = xMin; x < xMax; x++) {
@@ -145,87 +205,8 @@ public class WavesPanel extends JPanel {
                 double v = vMin
                         + (y - yMin) / yHeight * vHeight;
 
-                // TO-DO: If you wish to create an image
-                // of some part of the Mandelbrot set...
-                // 1) Define a class that models a
-                //    complex number.
-                // 2) Create a complex number whose
-                //    real component is u and whose
-                //    imaginary component is v.
-                //
-                //    Complex z = new Complex( 0.0, 0.0 );
-                //    Complex c = new Complex( u, v );
-                //
-                //  3) Write a loop that repeatedly updates
-                //     the value of z.
-                //
-                //    int i = 0;
-                //    while( z.magnitudeSquare() < 4.0 &&
-                //            i < 50 ) {
-                //        z = z.multiply(z);
-                //        z = z.add(c);
-                //        i = i + 1;
-                //    } // while
-                //
-                //  4) Let the value of i when this
-                //     loop ends determine the color
-                //     of the pixel.
-
-//                double t = (x - xMin)/xWidth;
-
-                // TO-DO: Here, I have assumed that
-                // the pebble has fallen into the
-                // center of our world. Can you
-                // modify this program to show the
-                // ripples that move outward from a
-                // point that is not at the center of
-                // the world, but somewhere else?
-
-                // Distance of a point from the center
-                // of a ripple.
-                double distances = 0.0;
-                Point2D p = new Point2D.Double(u, v);
-                for (Ripple r : ripples) {
-                    distances += r.getHeight(p);
-                } // for
-                distances /= ripples.size();
-
-                // A wave has 3 properties:
-                //   * amplitude is the height of wave
-                //   * frequency is spacing between waves
-                //   * phase is position of a crest
-                //     relative to some fixed location
-                // TO-DO: Experiment with different
-                // values of amplitude, frequency, and
-                // phase.
-//                double amplitude = 1.0;
-//                double frequency = 48.0;
-//                double phase = 0.0;
-//
-//                double t = amplitude * Math.sin(
-//                        frequency * distance + phase);
-                double t = (distances + 1) / 2.0;
-
-                Color c = weightedAverage(
-                        FG_COLOR, BG_COLOR, t);
-
-                // TO-DO: Can you draw overlapping
-                // ripples from several stones?
-
-                // TO-DO: Try this way of assigning colors.
-                //raster.setPixel(x, y, makeColorArray(c));
-
-                // TO-DO: Or try this way of assigning colors.
-                // TO-DO: Try different values of k.
-                // TO-DO: Try using more than 2 colors.
-                int k = 8;
-                if (Math.round(t * k) % 2 == 0) {
-                    raster.setPixel(x, y, makeColorArray(FG_COLOR));
-                } // if
-                else {
-                    raster.setPixel(x, y, makeColorArray(BG_COLOR));
-                } // else
-
+                Color c = shade(x, y, u, v, ripples);
+                raster.setPixel(x, y, makeColorArray(c));
             } // for
         } // for
 

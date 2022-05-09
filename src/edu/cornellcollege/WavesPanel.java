@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This class gives us a rectangular region
+ * within a window in which we can draw a picture.
+ */
 public class WavesPanel extends JPanel {
 
     private final Random rng;
@@ -24,30 +28,98 @@ public class WavesPanel extends JPanel {
     public WavesPanel() {
         this.rng = new Random();
         this.numberOfColors = 24;
-        this.numberOfSites = 5;
-        this.frequency = 40;
+        this.numberOfSites = 9;
+        this.frequency = 48;
 
         int min = 64;
-        this.palette = randomPalette(min);
+        this.palette = randomPalette(min, 256 - min);
+//        this.palette = gradientPalette(
+//                64, 96,
+//                128, 255);
+//        this.palette = interleavedPalette(
+//                40, 80,
+//                192, 255);
 
-        //int number = 4;
-        this.sites = gridSites();
+        //this.sites = gridSites();
+        this.sites = polygonSites();
+        //this.sites = randomSites();
 
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
 
-    private final List<Color> randomPalette(int min) {
+    private Color randomColor(int min, int max) {
+
+        int red = min
+                + this.rng.nextInt(max - min);
+        int green = min
+                + this.rng.nextInt(max - min);
+        int blue = min
+                + this.rng.nextInt(max - min);
+
+        return new Color(red, green, blue);
+    } // randomColor( int, int )
+
+    private final List<Color> gradientPalette(
+            int darkLo,
+            int darkHi,
+            int lightLo,
+            int lightHi) {
+        List<Color> result = new ArrayList<>();
+
+        Color dark = randomColor(darkLo, darkHi);
+        Color light = randomColor(lightLo, lightHi);
+
+        int n = this.numberOfColors;
+
+        for (int i = 0; i < n; i++) {
+            double t = ((double) i) / n;
+
+            Color c = weightedAverage(dark, light, t);
+            result.add(c);
+        } // for
+
+        return result;
+    } // gradientPalette( int, int, int, int )
+
+    private final List<Color> interleavedPalette(
+            int darkLo,
+            int darkHi,
+            int lightLo,
+            int lightHi
+    ) {
+        List<Color> result = new ArrayList<>();
+
+        Color dark0 = randomColor(darkLo, darkHi);
+        Color light0 = randomColor(lightLo, lightHi);
+        Color dark1 = randomColor(darkLo, darkHi);
+        Color light1 = randomColor(lightLo, lightHi);
+
+        int n = this.numberOfColors;
+
+        for (int i = 0; i < n; i++) {
+            double t = ((double) i) / n;
+
+            if (i % 2 == 0) {
+                Color c = weightedAverage(dark0, light0, t);
+                result.add(c);
+            } // if
+            else {
+                Color c = weightedAverage(light1, dark1, t);
+                result.add(c);
+            } // else
+        } // for
+
+        return result;
+    } // interleavedPalette( int, int, int, int )
+
+    private final List<Color> randomPalette(
+            int min,
+            int max) {
 
         List<Color> result = new ArrayList<>();
 
         for (int i = 0; i < this.numberOfColors; i++) {
-            int red = min
-                    + this.rng.nextInt(256 - min);
-            int green = min
-                    + this.rng.nextInt(256 - min);
-            int blue = min
-                    + this.rng.nextInt(256 - min);
-            Color c = new Color(red, green, blue);
+            Color c = randomColor(min, max);
             result.add(c);
         } // for
 
@@ -139,30 +211,51 @@ public class WavesPanel extends JPanel {
 
         int n = this.numberOfSites;
 
-        for( int i = 0; i < n; i++ ) {
-            double vertical = ((double) i)/n;
+        for (int i = 0; i < n; i++) {
+            double vertical = ((double) i) / n;
             double y = yMin + vertical * (yMax - yMin);
 
-            for( int j = 0; j< n; j++ ) {
-                double horizontal = ((double) j)/n;
+            for (int j = 0; j < n; j++) {
+                double horizontal = ((double) j) / n;
                 double x = xMin + horizontal * (xMax - xMin);
 
-                Point2D p = new Point2D.Double( x, y );
-                result.add( p );
+                Point2D p = new Point2D.Double(x, y);
+                result.add(p);
             } // for
         } // for
 
         return result;
     } // gridSites()
 
+    public final List<Point2D> polygonSites() {
+        List<Point2D> result = new ArrayList<>();
+
+        int n = this.numberOfSites;
+        double radius = (Math.sqrt(5) + 1)/2;
+
+        for( int i = 0; i < n; i++ ) {
+            double fraction = ((double) i)/n;
+            double angle = fraction * 2.0 * Math.PI;
+
+            double x = radius * Math.cos( angle );
+            double y = radius * Math.sin( angle );
+
+            Point2D p = new Point2D.Double( x, y );
+
+            result.add( p );
+        } // for
+
+        return result;
+    } // polygonSites()
+
     public final List<Ripple> ripples(
             Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();
         for (Point2D p : this.sites) {
             double u = bounds.getMinX()
-                    + (p.getX() + 1)/2 * bounds.getWidth();
+                    + (p.getX() + 1) / 2 * bounds.getWidth();
             double v = bounds.getMinY()
-                    + (p.getY() + 1)/2 * bounds.getHeight();
+                    + (p.getY() + 1) / 2 * bounds.getHeight();
 
             Point2D center = new Point2D.Double(u, v);
 

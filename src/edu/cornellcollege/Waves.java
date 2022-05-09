@@ -8,7 +8,10 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
+/**
+ * This class models a window in which we
+ * can place an image.
+ */
 public class Waves extends JFrame implements ActionListener {
 
     private static final int FRAME_WIDTH = 768;

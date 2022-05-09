@@ -2,6 +2,10 @@ package edu.cornellcollege;
 
 import java.awt.geom.Point2D;
 
+/**
+ * This class models a wave that radiates
+ * from a specified point.
+ */
 public class Ripple {
     private Point2D center;
     private double amplitude;

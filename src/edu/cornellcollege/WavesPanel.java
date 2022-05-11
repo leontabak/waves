@@ -128,6 +128,11 @@ public class WavesPanel extends JPanel {
         this.repaint();
     } // setPointPattern( PointPattern )
 
+    public void setFrequency( int frequency ) {
+        this.frequency = frequency;
+        this.repaint();
+    } // setFrequency( int )
+
     private Color randomColor(int min, int max) {
 
         int red = min

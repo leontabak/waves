@@ -116,25 +116,28 @@ public class Waves extends JFrame implements ActionListener {
         createMenuItem(pointPatternMenu, PPPOLYGON, this);
         createMenuItem(pointPatternMenu, PPRANDOM, this);
 
+        FrequencyCountListener frequencyListener =
+                new FrequencyCountListener(panel);
+
         JMenu frequencyMenu = createMenu( menuBar, FREQUENCY );
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ02.getName(),
-                this);
+                frequencyListener);
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ04.getName(),
-                this);
+                frequencyListener);
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ08.getName(),
-                this);
+                frequencyListener);
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ16.getName(),
-                this);
+                frequencyListener);
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ32.getName(),
-                this);
+                frequencyListener);
         createMenuItem( frequencyMenu,
                 FrequencyCount.FREQ64.getName(),
-                this);
+                frequencyListener);
 
         this.setVisible(true);
     } // Waves()

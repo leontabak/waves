@@ -18,8 +18,4 @@ public enum FrequencyCount {
         return this.name;
     } // getName()
 
-    public int getValue() {
-        return Integer.parseInt( this.name );
-    } // getValue()
-
 } // FrequencyCount

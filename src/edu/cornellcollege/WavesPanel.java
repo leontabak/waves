@@ -19,17 +19,21 @@ import java.util.Random;
 public class WavesPanel extends JPanel {
 
     private final Random rng;
-    private final List<Color> palette;
-    private final List<Point2D> sites;
+    private List<Color> palette;
+    private List<Point2D> sites;
     private int numberOfColors;
     private int numberOfSites;
+    private ColorPattern colorPattern;
+    private PointPattern pointPattern;
     private double frequency;
 
     public WavesPanel() {
         this.rng = new Random();
-        this.numberOfColors = 24;
-        this.numberOfSites = 9;
-        this.frequency = 48;
+        this.numberOfColors = 64;
+        this.numberOfSites = 6;
+        this.colorPattern = ColorPattern.RANDOM;
+        this.pointPattern = PointPattern.GRID;
+        this.frequency = 40;
 
         int min = 64;
         this.palette = randomPalette(min, 256 - min);
@@ -46,6 +50,83 @@ public class WavesPanel extends JPanel {
 
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
+
+    public void setNumberOfColors(int count) {
+        this.numberOfColors = count;
+
+        int min = 64;
+
+        if (this.colorPattern == ColorPattern.GRADIENT) {
+            this.palette = gradientPalette(
+                    64, 96,
+                    128, 255);
+        } // if
+        else if (this.colorPattern == ColorPattern.INTERLEAVED) {
+            this.palette = interleavedPalette(
+                40, 80,
+                192, 255);
+        } // else if
+        else if (this.colorPattern == ColorPattern.RANDOM) {
+            this.palette = randomPalette(min, 256 - min);
+        } // else if
+
+
+        this.repaint();
+    } // setNumberOfColors( int )
+
+    public void setColorPattern( ColorPattern pattern ) {
+        this.colorPattern = pattern;
+
+        int min = 64;
+
+        if (this.colorPattern == ColorPattern.GRADIENT) {
+            this.palette = gradientPalette(
+                    64, 96,
+                    128, 255);
+        } // if
+        else if (this.colorPattern == ColorPattern.INTERLEAVED) {
+            this.palette = interleavedPalette(
+                    40, 80,
+                    192, 255);
+        } // else if
+        else if (this.colorPattern == ColorPattern.RANDOM) {
+            this.palette = randomPalette(min, 256 - min);
+        } // else if
+
+        this.repaint();
+    } // setColorPattern( ColorPattern )
+
+    public void setNumberOfPoints(int count) {
+        this.numberOfSites = count;
+
+        if( this.pointPattern == PointPattern.GRID) {
+            this.sites = gridSites();
+        } // if
+        else if( this.pointPattern == PointPattern.POLYGON) {
+            this.sites = polygonSites();
+        } // else if
+        else if( this.pointPattern == PointPattern.RANDOM) {
+            this.sites = randomSites();
+        } // else if
+
+        this.repaint();
+    } // setNumberOfPoints( int )
+
+    public void setPointPattern( PointPattern pattern ) {
+        this.pointPattern = pattern;
+
+        if( this.pointPattern == PointPattern.GRID) {
+            this.sites = gridSites();
+        } // if
+        else if( this.pointPattern == PointPattern.POLYGON) {
+            this.sites = polygonSites();
+        } // else if
+        else if( this.pointPattern == PointPattern.RANDOM) {
+            this.sites = randomSites();
+        } // else if
+
+        this.repaint();
+    } // setPointPattern( PointPattern )
 
     private Color randomColor(int min, int max) {
 
@@ -231,18 +312,18 @@ public class WavesPanel extends JPanel {
         List<Point2D> result = new ArrayList<>();
 
         int n = this.numberOfSites;
-        double radius = (Math.sqrt(5) + 1)/2;
+        double radius = (Math.sqrt(5) + 1) / 2;
 
-        for( int i = 0; i < n; i++ ) {
-            double fraction = ((double) i)/n;
+        for (int i = 0; i < n; i++) {
+            double fraction = ((double) i) / n;
             double angle = fraction * 2.0 * Math.PI;
 
-            double x = radius * Math.cos( angle );
-            double y = radius * Math.sin( angle );
+            double x = radius * Math.cos(angle);
+            double y = radius * Math.sin(angle);
 
-            Point2D p = new Point2D.Double( x, y );
+            Point2D p = new Point2D.Double(x, y);
 
-            result.add( p );
+            result.add(p);
         } // for
 
         return result;
@@ -298,6 +379,7 @@ public class WavesPanel extends JPanel {
         return c;
     } // shade( int, int, double, double, List<Ripple> )
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         java.awt.Graphics2D g2D = (Graphics2D) g;

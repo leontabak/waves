@@ -28,33 +28,41 @@ public class Waves extends JFrame implements ActionListener {
     // Names of menu items
     private static final String FSAVE = "Save";
 
-    private static final String CC002 = "2";
-    private static final String CC004 = "4";
-    private static final String CC008 = "8";
-    private static final String CC016 = "16";
-    private static final String CC032 = "32";
-    private static final String CC064 = "64";
-    private static final String CC128 = "128";
-    private static final String CC256 = "256";
+//    private static final String CC002 = "2";
+//    private static final String CC004 = "4";
+//    private static final String CC008 = "8";
+//    private static final String CC016 = "16";
+//    private static final String CC032 = "32";
+//    private static final String CC064 = "64";
+//    private static final String CC128 = "128";
+//    private static final String CC256 = "256";
 
-    private static final String CPGRADIENT = "Gradient";
-    private static final String CPINTERLEAVED = "Interleaved";
-    private static final String CPRANDOM = "Random";
+    private static final String CPGRADIENT =
+            "Gradient colors";
+    private static final String CPINTERLEAVED =
+            "Interleaved colors";
+    private static final String CPRANDOM =
+            "Random colors";
 
-    private static final String PC03 = "3";
-    private static final String PC04 = "4";
-    private static final String PC05 = "5";
-    private static final String PC06 = "6";
-    private static final String PC07 = "7";
-    private static final String PC08 = "8";
-    private static final String PC09 = "9";
-    private static final String PC10 = "10";
-    private static final String PC11 = "11";
-    private static final String PC12 = "12";
+//    private static final String PC03 = "3";
+//    private static final String PC04 = "4";
+//    private static final String PC05 = "5";
+//    private static final String PC06 = "6";
+//    private static final String PC07 = "7";
+//    private static final String PC08 = "8";
+//    private static final String PC09 = "9";
+//    private static final String PC10 = "10";
+//    private static final String PC11 = "11";
+//    private static final String PC12 = "12";
 
-    private static final String PPGRID = "Grid";
-    private static final String PPPOLYGON = "Polygon";
-    private static final String PPRANDOM = "Random";
+    private static final String PPGRID =
+            "Points on a grid";
+    private static final String PPPOLYGON =
+            "Points on a circle (a polygon)";
+    private static final String PPRANDOM =
+            "Points scattered randomly";
+
+    private WavesPanel panel;
 
     public Waves() {
         this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -62,7 +70,7 @@ public class Waves extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container pane = this.getContentPane();
-        WavesPanel panel = new WavesPanel();
+        this.panel = new WavesPanel();
         pane.add(panel);
 
         JMenuBar menuBar = new JMenuBar();
@@ -71,32 +79,56 @@ public class Waves extends JFrame implements ActionListener {
         JMenu fileMenu = createMenu(menuBar, FILE);
         createMenuItem(fileMenu, FSAVE, this);
 
+        ColorCountListener ccListener =
+                new ColorCountListener(panel);
+
         JMenu colorCountMenu = createMenu(menuBar, CCOUNT);
-        createMenuItem(colorCountMenu, CC002, this);
-        createMenuItem(colorCountMenu, CC004, this);
-        createMenuItem(colorCountMenu, CC008, this);
-        createMenuItem(colorCountMenu, CC016, this);
-        createMenuItem(colorCountMenu, CC032, this);
-        createMenuItem(colorCountMenu, CC064, this);
-        createMenuItem(colorCountMenu, CC128, this);
-        createMenuItem(colorCountMenu, CC256, this);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC002.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC004.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC008.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC016.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC032.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC064.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC128.getName(), ccListener);
+        createMenuItem(colorCountMenu,
+                ColorCount.CC256.getName(), ccListener);
 
         JMenu colorPatternMenu = createMenu(menuBar, CPATTERN);
         createMenuItem(colorPatternMenu, CPGRADIENT, this);
         createMenuItem(colorPatternMenu, CPINTERLEAVED, this);
         createMenuItem(colorPatternMenu, CPRANDOM, this);
 
+        PointCountListener pcListener =
+                new PointCountListener(panel);
+
         JMenu pointCountMenu = createMenu(menuBar, PCOUNT);
-        createMenuItem(pointCountMenu, PC03, this);
-        createMenuItem(pointCountMenu, PC04, this);
-        createMenuItem(pointCountMenu, PC05, this);
-        createMenuItem(pointCountMenu, PC06, this);
-        createMenuItem(pointCountMenu, PC07, this);
-        createMenuItem(pointCountMenu, PC08, this);
-        createMenuItem(pointCountMenu, PC09, this);
-        createMenuItem(pointCountMenu, PC10, this);
-        createMenuItem(pointCountMenu, PC11, this);
-        createMenuItem(pointCountMenu, PC12, this);
+        createMenuItem(pointCountMenu,
+                PointCount.PC03.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC04.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC05.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC06.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC07.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC08.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC09.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC10.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC11.getName(), pcListener);
+        createMenuItem(pointCountMenu,
+                PointCount.PC12.getName(), pcListener);
 
         JMenu pointPatternMenu = createMenu(menuBar, PPATTERN);
         createMenuItem(pointPatternMenu, PPGRID, this);
@@ -126,6 +158,39 @@ public class Waves extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        switch (command) {
+            case CPGRADIENT:
+                this.panel.setColorPattern(
+                        ColorPattern.GRADIENT);
+                break;
+            case CPINTERLEAVED:
+                this.panel.setColorPattern(
+                        ColorPattern.INTERLEAVED);
+                break;
+            case CPRANDOM:
+                this.panel.setColorPattern(
+                        ColorPattern.RANDOM);
+                break;
+            case PPGRID:
+                this.panel.setPointPattern(
+                        PointPattern.GRID
+                );
+                break;
+            case PPPOLYGON:
+                this.panel.setPointPattern(
+                        PointPattern.POLYGON
+                );
+                break;
+            case PPRANDOM:
+                this.panel.setPointPattern(
+                        PointPattern.RANDOM
+                );
+                break;
+            default:
+                break;
+        } // switch
 
     } // actionPerformed( ActionEvent )
 } // Waves

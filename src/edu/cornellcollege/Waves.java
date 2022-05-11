@@ -24,18 +24,10 @@ public class Waves extends JFrame implements ActionListener {
     private static final String CPATTERN = "Color pattern";
     private static final String PCOUNT = "Point count";
     private static final String PPATTERN = "Point pattern";
+    private static final String FREQUENCY = "Frequency";
 
     // Names of menu items
     private static final String FSAVE = "Save";
-
-//    private static final String CC002 = "2";
-//    private static final String CC004 = "4";
-//    private static final String CC008 = "8";
-//    private static final String CC016 = "16";
-//    private static final String CC032 = "32";
-//    private static final String CC064 = "64";
-//    private static final String CC128 = "128";
-//    private static final String CC256 = "256";
 
     private static final String CPGRADIENT =
             "Gradient colors";
@@ -43,17 +35,6 @@ public class Waves extends JFrame implements ActionListener {
             "Interleaved colors";
     private static final String CPRANDOM =
             "Random colors";
-
-//    private static final String PC03 = "3";
-//    private static final String PC04 = "4";
-//    private static final String PC05 = "5";
-//    private static final String PC06 = "6";
-//    private static final String PC07 = "7";
-//    private static final String PC08 = "8";
-//    private static final String PC09 = "9";
-//    private static final String PC10 = "10";
-//    private static final String PC11 = "11";
-//    private static final String PC12 = "12";
 
     private static final String PPGRID =
             "Points on a grid";
@@ -134,6 +115,26 @@ public class Waves extends JFrame implements ActionListener {
         createMenuItem(pointPatternMenu, PPGRID, this);
         createMenuItem(pointPatternMenu, PPPOLYGON, this);
         createMenuItem(pointPatternMenu, PPRANDOM, this);
+
+        JMenu frequencyMenu = createMenu( menuBar, FREQUENCY );
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ02.getName(),
+                this);
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ04.getName(),
+                this);
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ08.getName(),
+                this);
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ16.getName(),
+                this);
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ32.getName(),
+                this);
+        createMenuItem( frequencyMenu,
+                FrequencyCount.FREQ64.getName(),
+                this);
 
         this.setVisible(true);
     } // Waves()

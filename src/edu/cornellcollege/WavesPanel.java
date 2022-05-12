@@ -1,5 +1,6 @@
 package edu.cornellcollege;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,6 +9,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +21,9 @@ import java.util.Random;
  */
 public class WavesPanel extends JPanel {
 
+    private static final String FILE_FORMAT = "png";
+    private static final String FILE_NAME = "picture.png";
+
     private final Random rng;
     private List<Color> palette;
     private List<Point2D> sites;
@@ -26,6 +32,7 @@ public class WavesPanel extends JPanel {
     private ColorPattern colorPattern;
     private PointPattern pointPattern;
     private double frequency;
+    private BufferedImage image;
 
     public WavesPanel() {
         this.rng = new Random();
@@ -384,12 +391,24 @@ public class WavesPanel extends JPanel {
         return c;
     } // shade( int, int, double, double, List<Ripple> )
 
+    public void writeToFile() {
+        try {
+            ImageIO.write( this.image,
+                    FILE_FORMAT,
+                    new File(FILE_NAME));
+
+        } // try
+        catch( IOException e ) {
+            System.err.println( "Cannot write to file");
+        } // catch( IOException)
+    } // writeToFile()
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         java.awt.Graphics2D g2D = (Graphics2D) g;
 
-        BufferedImage image = new BufferedImage(
+        this.image = new BufferedImage(
                 this.getWidth(),
                 this.getHeight(),
                 BufferedImage.TYPE_INT_RGB);

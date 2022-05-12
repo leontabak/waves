@@ -192,6 +192,9 @@ public class Waves extends JFrame implements ActionListener {
                         PointPattern.RANDOM
                 );
                 break;
+            case FSAVE:
+                this.panel.writeToFile();
+                break;
             default:
                 break;
         } // switch

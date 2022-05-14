@@ -26,22 +26,8 @@ public class Waves extends JFrame implements ActionListener {
     private static final String PPATTERN = "Point pattern";
     private static final String FREQUENCY = "Frequency";
 
-    // Names of menu items
+    // Name of menu item
     private static final String FSAVE = "Save";
-
-    private static final String CPGRADIENT =
-            "Gradient colors";
-    private static final String CPINTERLEAVED =
-            "Interleaved colors";
-    private static final String CPRANDOM =
-            "Random colors";
-
-    private static final String PPGRID =
-            "Points on a grid";
-    private static final String PPPOLYGON =
-            "Points on a circle (a polygon)";
-    private static final String PPRANDOM =
-            "Points scattered randomly";
 
     private WavesPanel panel;
 
@@ -64,80 +50,44 @@ public class Waves extends JFrame implements ActionListener {
                 new ColorCountListener(panel);
 
         JMenu colorCountMenu = createMenu(menuBar, CCOUNT);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC002.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC004.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC008.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC016.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC032.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC064.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC128.getName(), ccListener);
-        createMenuItem(colorCountMenu,
-                ColorCount.CC256.getName(), ccListener);
 
+        for (ColorCount cc : ColorCount.values()) {
+            createMenuItem(colorCountMenu, cc.getName(), ccListener);
+        } // for
+
+        ColorPatternListener cpListener=
+                new ColorPatternListener( this.panel);
         JMenu colorPatternMenu = createMenu(menuBar, CPATTERN);
-        createMenuItem(colorPatternMenu, CPGRADIENT, this);
-        createMenuItem(colorPatternMenu, CPINTERLEAVED, this);
-        createMenuItem(colorPatternMenu, CPRANDOM, this);
+        for( ColorPattern cp: ColorPattern.values() ) {
+            createMenuItem(colorPatternMenu,
+                    cp.getName(), cpListener);
+        } // for
 
         PointCountListener pcListener =
                 new PointCountListener(panel);
 
         JMenu pointCountMenu = createMenu(menuBar, PCOUNT);
-        createMenuItem(pointCountMenu,
-                PointCount.PC03.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC04.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC05.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC06.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC07.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC08.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC09.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC10.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC11.getName(), pcListener);
-        createMenuItem(pointCountMenu,
-                PointCount.PC12.getName(), pcListener);
+        for (PointCount pc : PointCount.values()) {
+            createMenuItem(pointCountMenu,
+                    pc.getName(), pcListener);
+        } // for
 
+        PointPatternListener ppListener =
+                new PointPatternListener( this.panel );
         JMenu pointPatternMenu = createMenu(menuBar, PPATTERN);
-        createMenuItem(pointPatternMenu, PPGRID, this);
-        createMenuItem(pointPatternMenu, PPPOLYGON, this);
-        createMenuItem(pointPatternMenu, PPRANDOM, this);
+        for( PointPattern pp: PointPattern.values() ) {
+            createMenuItem( pointPatternMenu, pp.getName(), ppListener );
+        }
 
         FrequencyCountListener frequencyListener =
                 new FrequencyCountListener(panel);
 
-        JMenu frequencyMenu = createMenu( menuBar, FREQUENCY );
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ02.getName(),
-                frequencyListener);
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ04.getName(),
-                frequencyListener);
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ08.getName(),
-                frequencyListener);
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ16.getName(),
-                frequencyListener);
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ32.getName(),
-                frequencyListener);
-        createMenuItem( frequencyMenu,
-                FrequencyCount.FREQ64.getName(),
-                frequencyListener);
+        JMenu frequencyMenu = createMenu(menuBar, FREQUENCY);
+        for (FrequencyCount fc : FrequencyCount.values()) {
+            createMenuItem(frequencyMenu,
+                    fc.getName(),
+                    frequencyListener);
+        } // for
 
         this.setVisible(true);
     } // Waves()
@@ -164,40 +114,9 @@ public class Waves extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
 
-        switch (command) {
-            case CPGRADIENT:
-                this.panel.setColorPattern(
-                        ColorPattern.GRADIENT);
-                break;
-            case CPINTERLEAVED:
-                this.panel.setColorPattern(
-                        ColorPattern.INTERLEAVED);
-                break;
-            case CPRANDOM:
-                this.panel.setColorPattern(
-                        ColorPattern.RANDOM);
-                break;
-            case PPGRID:
-                this.panel.setPointPattern(
-                        PointPattern.GRID
-                );
-                break;
-            case PPPOLYGON:
-                this.panel.setPointPattern(
-                        PointPattern.POLYGON
-                );
-                break;
-            case PPRANDOM:
-                this.panel.setPointPattern(
-                        PointPattern.RANDOM
-                );
-                break;
-            case FSAVE:
-                this.panel.writeToFile();
-                break;
-            default:
-                break;
-        } // switch
+        if( command.equals( FSAVE )) {
+            this.panel.writeToFile();
+        } // if
 
     } // actionPerformed( ActionEvent )
 } // Waves

@@ -70,8 +70,8 @@ public class WavesPanel extends JPanel {
         } // if
         else if (this.colorPattern == ColorPattern.INTERLEAVED) {
             this.palette = interleavedPalette(
-                40, 80,
-                192, 255);
+                    40, 80,
+                    192, 255);
         } // else if
         else if (this.colorPattern == ColorPattern.RANDOM) {
             this.palette = randomPalette(min, 256 - min);
@@ -81,12 +81,14 @@ public class WavesPanel extends JPanel {
         this.repaint();
     } // setNumberOfColors( int )
 
-    public void setColorPattern( ColorPattern pattern ) {
+    public void setColorPattern(ColorPattern pattern) {
         this.colorPattern = pattern;
 
         int min = 64;
-
-        if (this.colorPattern == ColorPattern.GRADIENT) {
+        if (this.colorPattern == ColorPattern.BLACK_AND_WHITE) {
+            this.palette = blackAndWhitePalette();
+        } // if
+        else if (this.colorPattern == ColorPattern.GRADIENT) {
             this.palette = gradientPalette(
                     64, 96,
                     128, 255);
@@ -106,36 +108,42 @@ public class WavesPanel extends JPanel {
     public void setNumberOfPoints(int count) {
         this.numberOfSites = count;
 
-        if( this.pointPattern == PointPattern.GRID) {
+        if (this.pointPattern == PointPattern.GRID) {
             this.sites = gridSites();
         } // if
-        else if( this.pointPattern == PointPattern.POLYGON) {
+        else if (this.pointPattern == PointPattern.POLYGON) {
             this.sites = polygonSites();
         } // else if
-        else if( this.pointPattern == PointPattern.RANDOM) {
+        else if (this.pointPattern == PointPattern.RANDOM) {
             this.sites = randomSites();
+        } // else if
+        else if (this.pointPattern == PointPattern.STAR_POLYGON) {
+            this.sites = starPolygonSites();
         } // else if
 
         this.repaint();
     } // setNumberOfPoints( int )
 
-    public void setPointPattern( PointPattern pattern ) {
+    public void setPointPattern(PointPattern pattern) {
         this.pointPattern = pattern;
 
-        if( this.pointPattern == PointPattern.GRID) {
+        if (this.pointPattern == PointPattern.GRID) {
             this.sites = gridSites();
         } // if
-        else if( this.pointPattern == PointPattern.POLYGON) {
+        else if (this.pointPattern == PointPattern.POLYGON) {
             this.sites = polygonSites();
         } // else if
-        else if( this.pointPattern == PointPattern.RANDOM) {
+        else if (this.pointPattern == PointPattern.STAR_POLYGON) {
+            this.sites = starPolygonSites();
+        } // else if
+        else if (this.pointPattern == PointPattern.RANDOM) {
             this.sites = randomSites();
         } // else if
 
         this.repaint();
     } // setPointPattern( PointPattern )
 
-    public void setFrequency( int frequency ) {
+    public void setFrequency(int frequency) {
         this.frequency = frequency;
         this.repaint();
     } // setFrequency( int )
@@ -151,6 +159,21 @@ public class WavesPanel extends JPanel {
 
         return new Color(red, green, blue);
     } // randomColor( int, int )
+
+    private final List<Color> blackAndWhitePalette() {
+        List<Color> result = new ArrayList<>();
+
+        for (int i = 0; i < this.numberOfColors; i++) {
+            if (i % 2 == 0) {
+                result.add(Color.BLACK);
+            } // if
+            else {
+                result.add(Color.WHITE);
+            } // else
+        } // for
+
+        return result;
+    } // blackAndWhitePalette()
 
     private final List<Color> gradientPalette(
             int darkLo,
@@ -341,6 +364,31 @@ public class WavesPanel extends JPanel {
         return result;
     } // polygonSites()
 
+    public final List<Point2D> starPolygonSites() {
+        List<Point2D> result = new ArrayList<>();
+
+        int n = this.numberOfSites;
+        double radius = (Math.sqrt(5) + 1) / 2;
+
+        for (int i = 0; i < 2 * n; i++) {
+            double fraction = ((double) i) / n;
+            double angle = fraction * 2.0 * Math.PI;
+
+            double r = radius;
+            if (i % 2 == 0) {
+                r *= 2 / (Math.sqrt(5) + 1);
+            }
+            double x = r * Math.cos(angle);
+            double y = r * Math.sin(angle);
+
+            Point2D p = new Point2D.Double(x, y);
+
+            result.add(p);
+        } // for
+
+        return result;
+    } // starPolygonSites()
+
     public final List<Ripple> ripples(
             Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();
@@ -393,13 +441,13 @@ public class WavesPanel extends JPanel {
 
     public void writeToFile() {
         try {
-            ImageIO.write( this.image,
+            ImageIO.write(this.image,
                     FILE_FORMAT,
                     new File(FILE_NAME));
 
         } // try
-        catch( IOException e ) {
-            System.err.println( "Cannot write to file");
+        catch (IOException e) {
+            System.err.println("Cannot write to file");
         } // catch( IOException)
     } // writeToFile()
 

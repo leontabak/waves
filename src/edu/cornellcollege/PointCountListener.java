@@ -8,7 +8,6 @@ public class PointCountListener implements ActionListener {
     private WavesPanel panel;
 
     public PointCountListener( WavesPanel panel ) {
-
         this.panel = panel;
     } // PointCountListener( WavesPanel )
 

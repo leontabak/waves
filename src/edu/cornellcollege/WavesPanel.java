@@ -27,6 +27,7 @@ public class WavesPanel extends JPanel {
     private final Random rng;
     private final ColorMaker colorMaker;
     private List<Color> palette;
+    private final SitesMaker sitesMaker;
     private List<Point2D> sites;
     private int numberOfColors;
     private int numberOfSites;
@@ -39,6 +40,7 @@ public class WavesPanel extends JPanel {
         this.rng = new Random();
         this.colorMaker = new ColorMaker( this.rng );
         this.numberOfColors = 64;
+        this.sitesMaker = new SitesMaker( this.rng );
         this.numberOfSites = 6;
         this.colorPattern = ColorPattern.RANDOM;
         this.pointPattern = PointPattern.GRID;
@@ -47,9 +49,9 @@ public class WavesPanel extends JPanel {
         this.palette = this.colorMaker.getPalette(
                 ColorPattern.RANDOM, this.numberOfColors );
 
-        //this.sites = gridSites();
-        this.sites = polygonSites();
-        //this.sites = randomSites();
+        this.sites = this.sitesMaker.getSites(
+                PointPattern.RANDOM, this.numberOfColors
+        );
 
         this.setBackground(Color.DARK_GRAY);
     } // WavesPanel()
@@ -79,18 +81,10 @@ public class WavesPanel extends JPanel {
     public void setNumberOfPoints(int count) {
         this.numberOfSites = count;
 
-        if (this.pointPattern == PointPattern.GRID) {
-            this.sites = gridSites();
-        } // if
-        else if (this.pointPattern == PointPattern.POLYGON) {
-            this.sites = polygonSites();
-        } // else if
-        else if (this.pointPattern == PointPattern.RANDOM) {
-            this.sites = randomSites();
-        } // else if
-        else if (this.pointPattern == PointPattern.STAR_POLYGON) {
-            this.sites = starPolygonSites();
-        } // else if
+        this.sites = this.sitesMaker.getSites(
+                this.pointPattern,
+                this.numberOfSites
+        );
 
         this.repaint();
     } // setNumberOfPoints( int )
@@ -98,18 +92,10 @@ public class WavesPanel extends JPanel {
     public void setPointPattern(PointPattern pattern) {
         this.pointPattern = pattern;
 
-        if (this.pointPattern == PointPattern.GRID) {
-            this.sites = gridSites();
-        } // if
-        else if (this.pointPattern == PointPattern.POLYGON) {
-            this.sites = polygonSites();
-        } // else if
-        else if (this.pointPattern == PointPattern.STAR_POLYGON) {
-            this.sites = starPolygonSites();
-        } // else if
-        else if (this.pointPattern == PointPattern.RANDOM) {
-            this.sites = randomSites();
-        } // else if
+        this.sites = this.sitesMaker.getSites(
+                this.pointPattern,
+                this.numberOfSites
+        );
 
         this.repaint();
     } // setPointPattern( PointPattern )
@@ -135,94 +121,7 @@ public class WavesPanel extends JPanel {
         int[] result = {red, green, blue};
         return result;
     } // makeColorArray( Color )
-
-    public final List<Point2D> randomSites() {
-        List<Point2D> result = new ArrayList<>();
-
-        for (int i = 0; i < this.numberOfSites; i++) {
-            double u = 2 * rng.nextDouble() - 1;
-            double v = 2 * rng.nextDouble() - 1;
-
-            Point2D p = new Point2D.Double(u, v);
-
-            result.add(p);
-        } // for
-
-        return result;
-    } // randomSites()
-
-    public final List<Point2D> gridSites() {
-        List<Point2D> result = new ArrayList<>();
-
-        double xMin = -0.8;
-        double xMax = +0.8;
-        double yMin = -0.8;
-        double yMax = +0.8;
-
-        int n = this.numberOfSites;
-
-        for (int i = 0; i < n; i++) {
-            double vertical = ((double) i) / n;
-            double y = yMin + vertical * (yMax - yMin);
-
-            for (int j = 0; j < n; j++) {
-                double horizontal = ((double) j) / n;
-                double x = xMin + horizontal * (xMax - xMin);
-
-                Point2D p = new Point2D.Double(x, y);
-                result.add(p);
-            } // for
-        } // for
-
-        return result;
-    } // gridSites()
-
-    public final List<Point2D> polygonSites() {
-        List<Point2D> result = new ArrayList<>();
-
-        int n = this.numberOfSites;
-        double radius = (Math.sqrt(5) + 1) / 2;
-
-        for (int i = 0; i < n; i++) {
-            double fraction = ((double) i) / n;
-            double angle = fraction * 2.0 * Math.PI;
-
-            double x = radius * Math.cos(angle);
-            double y = radius * Math.sin(angle);
-
-            Point2D p = new Point2D.Double(x, y);
-
-            result.add(p);
-        } // for
-
-        return result;
-    } // polygonSites()
-
-    public final List<Point2D> starPolygonSites() {
-        List<Point2D> result = new ArrayList<>();
-
-        int n = this.numberOfSites;
-        double radius = (Math.sqrt(5) + 1) / 2;
-
-        for (int i = 0; i < 2 * n; i++) {
-            double fraction = ((double) i) / n;
-            double angle = fraction * 2.0 * Math.PI;
-
-            double r = radius;
-            if (i % 2 == 0) {
-                r *= 2 / (Math.sqrt(5) + 1);
-            }
-            double x = r * Math.cos(angle);
-            double y = r * Math.sin(angle);
-
-            Point2D p = new Point2D.Double(x, y);
-
-            result.add(p);
-        } // for
-
-        return result;
-    } // starPolygonSites()
-
+    
     public final List<Ripple> ripples(
             Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();

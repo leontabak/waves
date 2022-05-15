@@ -1,12 +1,10 @@
 package edu.cornellcollege;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * This class models a window in which we
@@ -115,7 +113,13 @@ public class Waves extends JFrame implements ActionListener {
         String command = e.getActionCommand();
 
         if( command.equals( FSAVE )) {
-            this.panel.writeToFile();
+            JFileChooser chooser = new JFileChooser();
+            int selection = chooser.showSaveDialog(this);
+            if( selection == JFileChooser.APPROVE_OPTION ) {
+                File file = chooser.getSelectedFile();
+                this.panel.writeToFile( file );
+            } // if
+
         } // if
 
     } // actionPerformed( ActionEvent )

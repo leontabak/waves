@@ -121,7 +121,7 @@ public class WavesPanel extends JPanel {
         int[] result = {red, green, blue};
         return result;
     } // makeColorArray( Color )
-    
+
     public final List<Ripple> ripples(
             Rectangle2D bounds) {
         List<Ripple> ripples = new ArrayList<>();
@@ -147,42 +147,27 @@ public class WavesPanel extends JPanel {
         for (Ripple r : ripples) {
             distances += r.getHeight(p);
         } // for
+
         distances /= ripples.size();
+
+        //distances = Math.pow( distances, 0.5 );
+        //distances = Math.pow( distances, 3.0 );
+
+        //distances = 1.0 / (1.0 + Math.exp( -distances) );
 
         return distances;
     } // getSumOfHeights()
 
-//    public Color shade(int x, int y,
-//                       double u, double v,
-//                       List<Ripple> ripples) {
-//        double distances =
-//                getSumOfHeights(u, v, ripples);
-//
-//        double t = (distances + 1) / 2.0;
-//
-//        Color continuous = weightedAverage(
-//                palette.get(0), palette.get(1), t);
-//
-//        int index = (int) (t * palette.size());
-//        Color discrete = palette.get(index);
-//
-//        double weight = 1.0;
-//        Color c = weightedAverage(continuous, discrete, weight);
-//
-//        return c;
-//    } // shade( int, int, double, double, List<Ripple> )
-
-    public void writeToFile() {
+    public void writeToFile( File file ) {
         try {
             ImageIO.write(this.image,
                     FILE_FORMAT,
-                    new File(FILE_NAME));
-
+                    file);
         } // try
         catch (IOException e) {
             System.err.println("Cannot write to file");
         } // catch( IOException)
-    } // writeToFile()
+    } // writeToFile( File )
 
     @Override
     public void paintComponent(Graphics g) {

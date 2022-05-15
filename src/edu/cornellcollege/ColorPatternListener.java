@@ -8,6 +8,7 @@ public class ColorPatternListener implements ActionListener {
     private WavesPanel panel;
 
     public ColorPatternListener(WavesPanel panel) {
+
         this.panel = panel;
     } // ColorPatternListener( WavesPanel )
 

@@ -25,6 +25,7 @@ public class WavesPanel extends JPanel {
     private static final String FILE_NAME = "picture.png";
 
     private final Random rng;
+    private final ColorMaker colorMaker;
     private List<Color> palette;
     private List<Point2D> sites;
     private int numberOfColors;
@@ -36,20 +37,15 @@ public class WavesPanel extends JPanel {
 
     public WavesPanel() {
         this.rng = new Random();
+        this.colorMaker = new ColorMaker( this.rng );
         this.numberOfColors = 64;
         this.numberOfSites = 6;
         this.colorPattern = ColorPattern.RANDOM;
         this.pointPattern = PointPattern.GRID;
         this.frequency = 40;
 
-        int min = 64;
-        this.palette = randomPalette(min, 256 - min);
-//        this.palette = gradientPalette(
-//                64, 96,
-//                128, 255);
-//        this.palette = interleavedPalette(
-//                40, 80,
-//                192, 255);
+        this.palette = this.colorMaker.getPalette(
+                ColorPattern.RANDOM, this.numberOfColors );
 
         //this.sites = gridSites();
         this.sites = polygonSites();
@@ -61,22 +57,10 @@ public class WavesPanel extends JPanel {
     public void setNumberOfColors(int count) {
         this.numberOfColors = count;
 
-        int min = 64;
-
-        if (this.colorPattern == ColorPattern.GRADIENT) {
-            this.palette = gradientPalette(
-                    64, 96,
-                    128, 255);
-        } // if
-        else if (this.colorPattern == ColorPattern.INTERLEAVED) {
-            this.palette = interleavedPalette(
-                    40, 80,
-                    192, 255);
-        } // else if
-        else if (this.colorPattern == ColorPattern.RANDOM) {
-            this.palette = randomPalette(min, 256 - min);
-        } // else if
-
+        this.palette = this.colorMaker.getPalette(
+                this.colorPattern,
+                this.numberOfColors
+        );
 
         this.repaint();
     } // setNumberOfColors( int )
@@ -84,23 +68,10 @@ public class WavesPanel extends JPanel {
     public void setColorPattern(ColorPattern pattern) {
         this.colorPattern = pattern;
 
-        int min = 64;
-        if (this.colorPattern == ColorPattern.BLACK_AND_WHITE) {
-            this.palette = blackAndWhitePalette();
-        } // if
-        else if (this.colorPattern == ColorPattern.GRADIENT) {
-            this.palette = gradientPalette(
-                    64, 96,
-                    128, 255);
-        } // if
-        else if (this.colorPattern == ColorPattern.INTERLEAVED) {
-            this.palette = interleavedPalette(
-                    40, 80,
-                    192, 255);
-        } // else if
-        else if (this.colorPattern == ColorPattern.RANDOM) {
-            this.palette = randomPalette(min, 256 - min);
-        } // else if
+        this.palette = this.colorMaker.getPalette(
+                this.colorPattern,
+                this.numberOfColors
+        );
 
         this.repaint();
     } // setColorPattern( ColorPattern )
@@ -148,142 +119,142 @@ public class WavesPanel extends JPanel {
         this.repaint();
     } // setFrequency( int )
 
-    private Color randomColor(int min, int max) {
+//    private Color randomColor(int min, int max) {
+//
+//        int red = min
+//                + this.rng.nextInt(max - min);
+//        int green = min
+//                + this.rng.nextInt(max - min);
+//        int blue = min
+//                + this.rng.nextInt(max - min);
+//
+//        return new Color(red, green, blue);
+//    } // randomColor( int, int )
+//
+//    private final List<Color> blackAndWhitePalette() {
+//        List<Color> result = new ArrayList<>();
+//
+//        for (int i = 0; i < this.numberOfColors; i++) {
+//            if (i % 2 == 0) {
+//                result.add(Color.BLACK);
+//            } // if
+//            else {
+//                result.add(Color.WHITE);
+//            } // else
+//        } // for
+//
+//        return result;
+//    } // blackAndWhitePalette()
+//
+//    private final List<Color> gradientPalette(
+//            int darkLo,
+//            int darkHi,
+//            int lightLo,
+//            int lightHi) {
+//        List<Color> result = new ArrayList<>();
+//
+//        Color dark = randomColor(darkLo, darkHi);
+//        Color light = randomColor(lightLo, lightHi);
+//
+//        int n = this.numberOfColors;
+//
+//        for (int i = 0; i < n; i++) {
+//            double t = ((double) i) / n;
+//
+//            Color c = weightedAverage(dark, light, t);
+//            result.add(c);
+//        } // for
+//
+//        return result;
+//    } // gradientPalette( int, int, int, int )
+//
+//    private final List<Color> interleavedPalette(
+//            int darkLo,
+//            int darkHi,
+//            int lightLo,
+//            int lightHi
+//    ) {
+//        List<Color> result = new ArrayList<>();
+//
+//        Color dark0 = randomColor(darkLo, darkHi);
+//        Color light0 = randomColor(lightLo, lightHi);
+//        Color dark1 = randomColor(darkLo, darkHi);
+//        Color light1 = randomColor(lightLo, lightHi);
+//
+//        int n = this.numberOfColors;
+//
+//        for (int i = 0; i < n; i++) {
+//            double t = ((double) i) / n;
+//
+//            if (i % 2 == 0) {
+//                Color c = weightedAverage(dark0, light0, t);
+//                result.add(c);
+//            } // if
+//            else {
+//                Color c = weightedAverage(light1, dark1, t);
+//                result.add(c);
+//            } // else
+//        } // for
+//
+//        return result;
+//    } // interleavedPalette( int, int, int, int )
+//
+//    private final List<Color> randomPalette(
+//            int min,
+//            int max) {
+//
+//        List<Color> result = new ArrayList<>();
+//
+//        for (int i = 0; i < this.numberOfColors; i++) {
+//            Color c = randomColor(min, max);
+//            result.add(c);
+//        } // for
+//
+//        return result;
+//    } // randomPalette()
 
-        int red = min
-                + this.rng.nextInt(max - min);
-        int green = min
-                + this.rng.nextInt(max - min);
-        int blue = min
-                + this.rng.nextInt(max - min);
-
-        return new Color(red, green, blue);
-    } // randomColor( int, int )
-
-    private final List<Color> blackAndWhitePalette() {
-        List<Color> result = new ArrayList<>();
-
-        for (int i = 0; i < this.numberOfColors; i++) {
-            if (i % 2 == 0) {
-                result.add(Color.BLACK);
-            } // if
-            else {
-                result.add(Color.WHITE);
-            } // else
-        } // for
-
-        return result;
-    } // blackAndWhitePalette()
-
-    private final List<Color> gradientPalette(
-            int darkLo,
-            int darkHi,
-            int lightLo,
-            int lightHi) {
-        List<Color> result = new ArrayList<>();
-
-        Color dark = randomColor(darkLo, darkHi);
-        Color light = randomColor(lightLo, lightHi);
-
-        int n = this.numberOfColors;
-
-        for (int i = 0; i < n; i++) {
-            double t = ((double) i) / n;
-
-            Color c = weightedAverage(dark, light, t);
-            result.add(c);
-        } // for
-
-        return result;
-    } // gradientPalette( int, int, int, int )
-
-    private final List<Color> interleavedPalette(
-            int darkLo,
-            int darkHi,
-            int lightLo,
-            int lightHi
-    ) {
-        List<Color> result = new ArrayList<>();
-
-        Color dark0 = randomColor(darkLo, darkHi);
-        Color light0 = randomColor(lightLo, lightHi);
-        Color dark1 = randomColor(darkLo, darkHi);
-        Color light1 = randomColor(lightLo, lightHi);
-
-        int n = this.numberOfColors;
-
-        for (int i = 0; i < n; i++) {
-            double t = ((double) i) / n;
-
-            if (i % 2 == 0) {
-                Color c = weightedAverage(dark0, light0, t);
-                result.add(c);
-            } // if
-            else {
-                Color c = weightedAverage(light1, dark1, t);
-                result.add(c);
-            } // else
-        } // for
-
-        return result;
-    } // interleavedPalette( int, int, int, int )
-
-    private final List<Color> randomPalette(
-            int min,
-            int max) {
-
-        List<Color> result = new ArrayList<>();
-
-        for (int i = 0; i < this.numberOfColors; i++) {
-            Color c = randomColor(min, max);
-            result.add(c);
-        } // for
-
-        return result;
-    } // randomPalette()
-
-    /**
-     * Compute the weighted average of 2 numbers.
-     *
-     * @param a is one of the numbers to averaged.
-     * @param b is the other number to be averaged.
-     * @param t is the weight (0 <= t <= 1)
-     * @return the weighted average of a and b
-     */
-    public double weightedAverage(
-            double a,
-            double b,
-            double t) {
-        return (1 - t) * a + t * b;
-    } // weightedAverage( double, double, double )
-
-    /**
-     * Compute the weighted average of 2 colors.
-     *
-     * @param a is one color to be averaged.
-     * @param b is the other color to be averaged.
-     * @param t is the weight (0 <= t <= 1).
-     * @return the weighted average of the 2 colors.
-     */
-    public Color weightedAverage(
-            Color a,
-            Color b,
-            double t
-    ) {
-        double red = weightedAverage(
-                a.getRed(), b.getRed(), t);
-        double green = weightedAverage(
-                a.getGreen(), b.getGreen(), t);
-        double blue = weightedAverage(
-                a.getBlue(),
-                b.getBlue(),
-                t);
-        return new Color(
-                (int) (red),
-                (int) (green),
-                (int) (blue)
-        );
-    } // weightedAverage( Color, Color, double )
+//    /**
+//     * Compute the weighted average of 2 numbers.
+//     *
+//     * @param a is one of the numbers to averaged.
+//     * @param b is the other number to be averaged.
+//     * @param t is the weight (0 <= t <= 1)
+//     * @return the weighted average of a and b
+//     */
+//    public double weightedAverage(
+//            double a,
+//            double b,
+//            double t) {
+//        return (1 - t) * a + t * b;
+//    } // weightedAverage( double, double, double )
+//
+//    /**
+//     * Compute the weighted average of 2 colors.
+//     *
+//     * @param a is one color to be averaged.
+//     * @param b is the other color to be averaged.
+//     * @param t is the weight (0 <= t <= 1).
+//     * @return the weighted average of the 2 colors.
+//     */
+//    public Color weightedAverage(
+//            Color a,
+//            Color b,
+//            double t
+//    ) {
+//        double red = weightedAverage(
+//                a.getRed(), b.getRed(), t);
+//        double green = weightedAverage(
+//                a.getGreen(), b.getGreen(), t);
+//        double blue = weightedAverage(
+//                a.getBlue(),
+//                b.getBlue(),
+//                t);
+//        return new Color(
+//                (int) (red),
+//                (int) (green),
+//                (int) (blue)
+//        );
+//    } // weightedAverage( Color, Color, double )
 
     /**
      * Construct an array of integer primary color values
@@ -419,25 +390,25 @@ public class WavesPanel extends JPanel {
         return distances;
     } // getSumOfHeights()
 
-    public Color shade(int x, int y,
-                       double u, double v,
-                       List<Ripple> ripples) {
-        double distances =
-                getSumOfHeights(u, v, ripples);
-
-        double t = (distances + 1) / 2.0;
-
-        Color continuous = weightedAverage(
-                palette.get(0), palette.get(1), t);
-
-        int index = (int) (t * palette.size());
-        Color discrete = palette.get(index);
-
-        double weight = 1.0;
-        Color c = weightedAverage(continuous, discrete, weight);
-
-        return c;
-    } // shade( int, int, double, double, List<Ripple> )
+//    public Color shade(int x, int y,
+//                       double u, double v,
+//                       List<Ripple> ripples) {
+//        double distances =
+//                getSumOfHeights(u, v, ripples);
+//
+//        double t = (distances + 1) / 2.0;
+//
+//        Color continuous = weightedAverage(
+//                palette.get(0), palette.get(1), t);
+//
+//        int index = (int) (t * palette.size());
+//        Color discrete = palette.get(index);
+//
+//        double weight = 1.0;
+//        Color c = weightedAverage(continuous, discrete, weight);
+//
+//        return c;
+//    } // shade( int, int, double, double, List<Ripple> )
 
     public void writeToFile() {
         try {
@@ -506,7 +477,14 @@ public class WavesPanel extends JPanel {
                 double v = vMin
                         + (y - yMin) / yHeight * vHeight;
 
-                Color c = shade(x, y, u, v, ripples);
+                double distances =
+                        getSumOfHeights(u, v, ripples);
+
+                double t = (distances + 1) / 2.0;
+
+                int index = (int) (t * palette.size());
+                Color c = palette.get(index);
+
                 raster.setPixel(x, y, makeColorArray(c));
             } // for
         } // for
